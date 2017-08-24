@@ -13,6 +13,9 @@ from PIL import Image
 
 
 def resizeImage(image, width, height):
+	'''
+	Resizes an image and returns the resized image name
+	'''
     try:
         resizingImg = Image.open(image)
 
@@ -30,6 +33,9 @@ def resizeImage(image, width, height):
 
 
 def analyzeImage(image, kernelVals, aspectRatio, contourWidth, contourHeightRange):
+	'''
+	Analyzes image to find rectangular area that contains lottery numbers
+	'''
 	# initialize a rectangular (wider than it is tall) and square
 	# structuring kernel
 	rectKernel = cv2.getStructuringElement(cv2.MORPH_RECT, kernelVals)
@@ -112,6 +118,9 @@ def analyzeImage(image, kernelVals, aspectRatio, contourWidth, contourHeightRang
 
 
 def analyzeDigits():
+	'''
+	Performs font matching
+	'''
 	# loop over the 4 groupings of 4 digits
 	for (i, (gX, gY, gW, gH)) in enumerate(locs):
 		# initialize the list of group digits
@@ -169,6 +178,10 @@ def analyzeDigits():
 
 
 def cleanData(numbersFound):
+	'''
+	Cleans data returned by pytesseract to extract only the lottery numbers as
+	an array
+	'''
 	lottoNumbers = []
 
 	# Get rid of non-digit characters
