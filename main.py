@@ -45,7 +45,6 @@ args = vars(ap.parse_args())
 # 	digits[i] = roi
 
 
-
 # Check if the image is rotated from camera, rotate it back and expand to fill entire img
 image = Image.open("sample_imgs/" + args["image"])
 image.save("sample_imgs/test.jpg")
