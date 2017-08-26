@@ -63,6 +63,7 @@ else:
 
 
 # Analyze the full ticket to find the numbers
+# Comment lines 67-76 if using code commented below
 image = cv2.imread("sample_imgs/" + args["image"])
 image = imutils.resize(image, width=300)
 locs = lotto.analyzeImage(image, (20, 3), 1, 150, (10, 21))
