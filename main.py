@@ -84,23 +84,23 @@ cv2.imwrite('sample_imgs/newCropped.png', crop)
 # while foundVals is None:
 # 	try:
 # 		# Analyze the full ticket to find the numbers
-# 		image = cv2.imread(args["image"])
+# 		image = cv2.imread("sample_imgs/" + args["image"])
 # 		image = imutils.resize(image, width=300)
-# 		locs = analyzeImage(image, (20, 3), 1, 150, (10, startVal))
+# 		locs = lotto.analyzeImage(image, (20, 3), 1, 150, (10, startVal))
 #
 #
 # 		# Analyze the cropped image with only the numbers in it
-# 		img = cv2.imread(args["image"])
+# 		img = cv2.imread("sample_imgs/" + args["image"])
 # 		img = imutils.resize(img, width=300)
 # 		crop = img[locs[1] - 5:locs[1] + locs[3] + 5, locs[0] - 5:locs[0] + locs[2] + 5]
-# 		cv2.imwrite('newCropped.png', crop)
+# 		cv2.imwrite('sample_imgs/newCropped.png', crop)
 #
-# 		image = cv2.imread('newCropped.png')
-# 		locs = analyzeImage(image, (10, 1), 0, 0, (0, startVal))
+# 		image = cv2.imread('sample_imgs/newCropped.png')
+# 		locs = lotto.analyzeImage(image, (10, 1), 0, 0, (0, startVal))
 # 		foundVals = True
-# 		#print startVal
+# 		print startVal
 # 	except:
-# 		#print startVal
+# 		print startVal
 # 		startVal += 1
 
 
