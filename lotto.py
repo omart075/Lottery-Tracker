@@ -76,73 +76,59 @@ def analyzeImage(image, kernelVals, aspectRatio, contourWidth, contourHeightRang
 	'''
 	Analyzes image to find rectangular area that contains lottery numbers
 	'''
-	# initialize a rectangular (wider than it is tall) and square
-	# structuring kernel
-	rectKernel = cv2.getStructuringElement(cv2.MORPH_RECT, kernelVals)
-	sqKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
 
+	#initialize structuring kernels
+	rectKernel = cv2.getStructuringElement(cv2.MORPH_RECT, kernelVals)
 
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 	# apply a tophat (whitehat) morphological operator to find light
-	# regions against a dark background (i.e., the credit card numbers)
+	# regions against a dark background
 	tophat = cv2.morphologyEx(gray, cv2.MORPH_BLACKHAT, rectKernel)
 	cv2.imshow("tophat", tophat)
 	cv2.waitKey(0)
 
-	# compute the Scharr gradient of the tophat image, then scale
-	# the rest back into the range [0, 255]
-	gradX = cv2.Sobel(tophat, ddepth=cv2.CV_32F, dx=1, dy=0,
-		ksize=-1)
+	# compute the Scharr gradient of the tophat image
+	gradX = cv2.Sobel(tophat, ddepth=cv2.CV_32F, dx=1, dy=0,ksize=-1)
 	gradX = np.absolute(gradX)
 	(minVal, maxVal) = (np.min(gradX), np.max(gradX))
 	gradX = (255 * ((gradX - minVal) / (maxVal - minVal)))
 	gradX = gradX.astype("uint8")
 
-	# apply a closing operation using the rectangular kernel to help
-	# cloes gaps in between credit card number digits, then apply
+	# close gaps in between numbers, then apply
 	# Otsu's thresholding method to binarize the image
 	gradX = cv2.morphologyEx(gradX, cv2.MORPH_CLOSE, rectKernel)
 	thresh = cv2.threshold(gradX, 0, 255,
 		cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
 
-	# apply a second closing operation to the binary image, again
-	# to help close gaps between credit card number regions
+	# apply a second closing operation to the binary image
 	thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, sqKernel)
-
 	cv2.imshow("thresh", thresh)
 	cv2.waitKey(0)
-	# find contours in the thresholded image, then initialize the
-	# list of digit locations
+
+	# find contours in the thresholded image and save number locations found
 	cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
 		cv2.CHAIN_APPROX_SIMPLE)
 	cnts = cnts[0] if imutils.is_cv2() else cnts[1]
 	locs = []
 	#print(cnts)
+
 	# loop over the contours
 	for (i, c) in enumerate(cnts):
-		# compute the bounding box of the contour, then use the
-		# bounding box coordinates to derive the aspect ratio
+
+		# compute the bounding box of the contour
 		(x, y, w, h) = cv2.boundingRect(c)
 		ar = w / float(h)
 
-		# since credit cards used a fixed size fonts with 4 groups
-		# of 4 digits, we can prune potential contours based on the
-		# aspect ratio
+		# get only certain contours based on parameters given
 		if ar > aspectRatio:
-			# contours can further be pruned on minimum/maximum width
-			# and height
 			if (w > contourWidth) and (h > contourHeightRange[0] and h < contourHeightRange[1]):
-				# append the bounding box region of the digits group
-				# to our locations list
 				locs.append((x, y, w, h))
 
-	# sort the digit locations from left-to-right, then initialize the
-	# list of classified digits
+	# sort the digit locations from left-to-right
 	locs = sorted(locs, key=lambda x:x[0])
-	print locs
 	output = []
-	#print (locs[0])
+	print (locs[0])
 
 	#analyzeDigits(locs, image)
 
