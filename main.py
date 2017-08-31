@@ -11,8 +11,8 @@ import lotto
 ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", required=True,
 	help="path to input image")
-ap.add_argument("-r", "--reference", required=True,
-	help="path to reference OCR-A image")
+# ap.add_argument("-r", "--reference", required=True,
+# 	help="path to reference OCR-A image")
 args = vars(ap.parse_args())
 
 
@@ -57,55 +57,29 @@ if testImage.size[0] > testImage.size[1]:
 #If image is too large, resize it
 image = Image.open("sample_imgs/" + args["image"])
 if image.size[0] > 600:
-	image = resizeImage("sample_imgs/" + args["image"], 504, 804)
+	image = lotto.resizeImage("sample_imgs/" + args["image"], 504, 804)
 else:
 	image = "sample_imgs/" + args["image"]
 
 
+# image = "sample_imgs/" + args["image"]
+# lotto.findTicket(image)
+
 # Analyze the full ticket to find the numbers
-# Comment lines 67-76 if using code commented below
 image = cv2.imread("sample_imgs/" + args["image"])
 image = imutils.resize(image, width=300)
-locs = lotto.analyzeImage(image, (20, 3), 1, 150, (10, 21))
+locs = lotto.analyzeImage(image, (20, 3), 1, 200, (0, 31))
 
 
 # Analyze the cropped image with only the numbers in it
 img = cv2.imread("sample_imgs/" + args["image"])
 img = imutils.resize(img, width=300)
 crop = img[locs[1] - 5:locs[1] + locs[3] + 5, locs[0] - 5:locs[0] + locs[2] + 5]
-cv2.imwrite('sample_imgs/newCropped.png', crop)
+cv2.imwrite('sample_imgs/ticketNums.png', crop)
 
 
-#Commented code keeps trying different values for the upper height bound since
-#some pics use [10, 21] and others use [10, 23]
-
-# foundVals = None
-# startVal = 21
-# while foundVals is None:
-# 	try:
-# 		# Analyze the full ticket to find the numbers
-# 		image = cv2.imread("sample_imgs/" + args["image"])
-# 		image = imutils.resize(image, width=300)
-# 		locs = lotto.analyzeImage(image, (20, 3), 1, 150, (10, startVal))
-#
-#
-# 		# Analyze the cropped image with only the numbers in it
-# 		img = cv2.imread("sample_imgs/" + args["image"])
-# 		img = imutils.resize(img, width=300)
-# 		crop = img[locs[1] - 5:locs[1] + locs[3] + 5, locs[0] - 5:locs[0] + locs[2] + 5]
-# 		cv2.imwrite('sample_imgs/newCropped.png', crop)
-#
-# 		image = cv2.imread('sample_imgs/newCropped.png')
-# 		locs = lotto.analyzeImage(image, (10, 1), 0, 0, (0, startVal))
-# 		foundVals = True
-# 		print startVal
-# 	except:
-# 		print startVal
-# 		startVal += 1
-
-
-
-image = cv2.imread('sample_imgs/newCropped.png')
+# Cleans up above image of numbers for tesseract
+image = cv2.imread('sample_imgs/ticketNums.png')
 cv2.imshow("Image", image)
 
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -113,9 +87,9 @@ gray = cv2.threshold(gray, 0, 255,cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
 
 blurred = cv2.GaussianBlur(gray, (3,3), 0)
 sharp = cv2.addWeighted(blurred, 1.5, blurred, -0.2, 0)
-cv2.imwrite('sample_imgs/croppedNum.png', sharp)
+cv2.imwrite('sample_imgs/tesseract.png', sharp)
 
-numbersFound = pytesseract.image_to_string(Image.open('sample_imgs/croppedNum.png'))
+numbersFound = pytesseract.image_to_string(Image.open('sample_imgs/tesseract.png'))
 print numbersFound
 cv2.waitKey(0)
 

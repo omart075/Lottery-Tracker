@@ -5,6 +5,52 @@ import imutils
 import cv2
 from PIL import Image
 
+def findTicket(imageName):
+	'''
+	Analyzes image to find rectangular area that contains lottery numbers
+	'''
+	image = cv2.imread(imageName)
+	resized = imutils.resize(image, width=300)
+	ratio = image.shape[0] / float(image.shape[0])
+
+	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+	blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+	thresh = cv2.threshold(blurred, 60, 255, cv2.THRESH_BINARY)[1]
+
+	cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+	cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+
+	for c in cnts:
+		M = cv2.moments(c)
+
+		shape = ""
+		peri = cv2.arcLength(c, True)
+		approx = cv2.approxPolyDP(c, 0.04 * peri, True)
+
+		if len(approx) == 4:
+			# compute the bounding box of the contour and use the
+			# bounding box to compute the aspect ratio
+			(x, y, w, h) = cv2.boundingRect(approx)
+			if h > 100:
+				print approx
+				ar = w / float(h)
+
+				shape = "square" if ar >= 0.95 and ar <= 1.05 else "rectangle"
+				print shape
+
+				c = c.astype("float")
+				c *= ratio
+				c = c.astype("int")
+				cv2.drawContours(image, [c], -1, (0, 255, 0), 2)
+
+				# show the output image
+				cv2.imshow("Image", image)
+				cv2.waitKey(0)
+
+				img = cv2.imread(imageName)
+				crop = img[y:y+h, x:x+w]
+				cv2.imwrite(imageName, crop)
+
 
 def resizeImage(image, width, height):
 	'''
@@ -94,17 +140,18 @@ def analyzeImage(image, kernelVals, aspectRatio, contourWidth, contourHeightRang
 	# sort the digit locations from left-to-right, then initialize the
 	# list of classified digits
 	locs = sorted(locs, key=lambda x:x[0])
+	print locs
 	output = []
 	#print (locs[0])
 
-	#analyzeDigits()
+	#analyzeDigits(locs, image)
 
-	#cv2.imshow("Image", image)
-	#cv2.waitKey(0)
+	# cv2.imshow("Image", image)
+	# cv2.waitKey(0)
 	return locs[0]
 
 
-def analyzeDigits():
+def analyzeDigits(locs, image):
 	'''
 	Performs font matching
 	'''
