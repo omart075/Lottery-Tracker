@@ -82,8 +82,8 @@ def analyzeImage(image, kernelVals, aspectRatio, contourWidth, contourHeightRang
 
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-	# apply a tophat (whitehat) morphological operator to find light
-	# regions against a dark background
+	# apply a blackhat morphological operator to find dark
+	# regions against a light background
 	tophat = cv2.morphologyEx(gray, cv2.MORPH_BLACKHAT, rectKernel)
 	cv2.imshow("tophat", tophat)
 	cv2.waitKey(0)
@@ -102,7 +102,7 @@ def analyzeImage(image, kernelVals, aspectRatio, contourWidth, contourHeightRang
 		cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
 
 	# apply a second closing operation to the binary image
-	thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, sqKernel)
+	#thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, sqKernel)
 	cv2.imshow("thresh", thresh)
 	cv2.waitKey(0)
 
@@ -122,13 +122,14 @@ def analyzeImage(image, kernelVals, aspectRatio, contourWidth, contourHeightRang
 
 		# get only certain contours based on parameters given
 		if ar > aspectRatio:
-			if (w > contourWidth) and (h > contourHeightRange[0] and h < contourHeightRange[1]):
+			if (w > contourWidth[0] and w < contourWidth[1]) and (h > contourHeightRange[0] and h < contourHeightRange[1]):
 				locs.append((x, y, w, h))
 
 	# sort the digit locations from left-to-right
 	locs = sorted(locs, key=lambda x:x[0])
+	print locs
 	output = []
-	print (locs[0])
+	#print (locs[0])
 
 	#analyzeDigits(locs, image)
 

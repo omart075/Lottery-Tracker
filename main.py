@@ -68,7 +68,7 @@ else:
 # Analyze the full ticket to find the numbers
 image = cv2.imread("sample_imgs/" + args["image"])
 image = imutils.resize(image, width=300)
-locs = lotto.analyzeImage(image, (20, 3), 1, 200, (0, 31))
+locs = lotto.analyzeImage(image, (20, 3), 1, (200, 270), (0, 31))
 
 
 # Analyze the cropped image with only the numbers in it
