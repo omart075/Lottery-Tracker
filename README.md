@@ -1,17 +1,13 @@
 # Lottery-Tracker
 This Python script uses OpenCV to read the lotto numbers off of a lottery ticket.
 
-# Examples
-Image:
+# Example
 ![Alt text](/sample_imgs/output1.png?raw=true "Script in Action")
 
-Morphology:
 ![Alt text](/sample_imgs/output2.png?raw=true "Script in Action")
 
-Isolated Numbers:
 ![Alt text](/sample_imgs/output3.png?raw=true "Script in Action")
 
-Output:
 ![Alt text](/sample_imgs/output4.png?raw=true "Script in Action")
 
 The array shown holds the numbers read from the ticket.
